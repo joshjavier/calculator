@@ -1,0 +1,158 @@
+/*************************
+ CSS variables
+ *************************/
+
+:root {
+  --background: #303030;
+  --button: #E5E0C3;
+  --operator: #60C3C3;
+  --equals: #E8934A;
+  --black: #111111;
+  --white: #FFFFFF;
+  --display: #E3EEE8;
+  --frame-bg: #FFFEE5;
+  --frame-border: #D8C08D;
+}
+
+/*************************
+ Resets
+ *************************/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  border: 0;
+}
+
+/*************************
+ General styles
+ *************************/
+
+body {
+  background-color: var(--background);
+  color: var(--black);
+  font-family: 'Inconsolata', monospace;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+/*************************
+ Calculator
+ *************************/
+
+.calculator {
+  background: var(--frame-bg);
+  border: 10px solid var(--frame-border);
+  padding: 30px;
+  /* max-width: 400px; */
+  border-radius: 3rem;
+}
+
+.calculator__display {
+  background: var(--display);
+  border-radius: 1rem;
+  box-shadow: inset 0 3px 8px rgba(17, 17, 17, 0.15);
+  text-align: right;
+  padding: 0.2em 0.4em;
+  font-size: 3rem;
+  margin-bottom: 30px;
+}
+
+.calculator__keys {
+  display: grid;
+  grid-template-columns: repeat(4, 60px);
+  grid-template-rows: repeat(5, 60px);
+  gap: 15px;
+  grid-template-areas:
+    ". . . divide"
+    "seven eight nine times"
+    "four five six minus"
+    "one two three plus"
+    ". . . .";
+}
+
+.one { grid-area: one; }
+.two { grid-area: two; }
+.three { grid-area: three; }
+.four { grid-area: four; }
+.five { grid-area: five; }
+.six { grid-area: six; }
+.seven { grid-area: seven; }
+.eight { grid-area: eight; }
+.nine { grid-area: nine; }
+
+.last-row {
+  grid-column: span 4;
+  display: grid;
+  grid-template-columns: 1.5fr 60px 1.5fr;
+  gap: inherit;
+}
+
+/*************************
+ Calculator keys
+ *************************/
+
+.github-link,
+button {
+  --button-dark: #B3AE98;
+  border-radius: 2rem;
+  background: var(--button);
+  font-size: 2rem;
+  border: 1px solid var(--button-dark);
+  box-shadow: 0 4px var(--button-dark),
+              0 8px 8px -4px rgb(17, 17, 17, 0.2);
+  position: relative;
+}
+
+.github-link {
+  display: grid;
+  place-items: center;
+}
+
+.github-link,
+.operator {
+  --button-dark: #468f8f;
+  color: var(--white);
+  background: var(--operator);
+  border: 1px solid var(--button-dark);
+  box-shadow: 0 4px var(--button-dark),
+              0 8px 8px -4px rgb(17, 17, 17, 0.2);
+}
+
+.equals {
+  --button-dark: #B5733A;
+  background: var(--equals);
+  border: 1px solid var(--button-dark);
+  box-shadow: 0 4px var(--button-dark),
+              0 8px 8px -4px rgb(17, 17, 17, 0.2);
+}
+
+.github-link:hover,
+.github-link:focus,
+button:hover,
+button:focus {
+  filter: brightness(1.08);
+  outline: none;
+}
+
+button:active {
+  top: 3px;
+  box-shadow: 0 1px #B3AE98,
+              0 0 8px rgb(17, 17, 17, 0.05);
+}
+

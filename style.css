@@ -104,7 +104,7 @@ body {
 }
 
 /*************************
- Calculator keys
+ Button styles
  *************************/
 
 .github-link,
@@ -116,7 +116,6 @@ button {
   border: 1px solid var(--button-dark);
   box-shadow: 0 4px var(--button-dark),
               0 8px 8px -4px rgb(17, 17, 17, 0.2);
-  position: relative;
 }
 
 .github-link {
@@ -150,9 +149,11 @@ button:focus {
   outline: none;
 }
 
+.github-link:active,
 button:active {
-  top: 3px;
+  transform: translateY(3px);
   box-shadow: 0 1px #B3AE98,
               0 0 8px rgb(17, 17, 17, 0.05);
+  padding: 0;
 }
 

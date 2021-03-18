@@ -1,5 +1,18 @@
 /****************************************
- Functions
+ Constants
+ ****************************************/
+
+const ADD = '+';
+const SUBTRACT = '−';
+const MULTIPLY = '×';
+const DIVIDE = '÷';
+
+const BUFFER_LIMIT = 10;
+const DIGIT = 'digit';
+const OPERATION = 'operation';
+
+/****************************************
+ Math functions
  ****************************************/
 
 function add(a, b) {
@@ -15,6 +28,7 @@ function multiply(a, b) {
 }
 
 function divide(a, b) {
+  if (b == 0) return ';(';
   return a / b;
 }
 
@@ -32,90 +46,118 @@ function operate(operator, a, b) {
 }
 
 /****************************************
- Interaction
+ Calculator functions
  ****************************************/
 
-function populateDisplay(e) {
-  const key = e.target.textContent;
-  const displayValue = display.textContent;
+// When does the display get updated?
+// - when pressing C and CE
+// - when pressing a digit or decimal point
+// - after pressing an operator
+// - after pressing equals
 
-  // Constraints
-  if ( (displayValue.length === 10) // 10 characters (incl. decimal point)
-    || (key === '.' && displayValue.indexOf('.') !== -1) // 1 decimal point
-  ) {
-    return;
+function cancelEntry() {
+  buffer = '0';
+  populateDisplay(buffer);
+}
+
+function clear() {
+  cancelEntry();
+  register = { a: 0, b: 0, operator: null, answer: 0, flag: null };
+}
+
+function updateBuffer(value, e) {
+  // Note: The buffer is always a string, otherwise "0." will still
+  // register as 0, and the user won't be able to enter decimals.
+
+  let buffer = value.toString();
+  const buttonText = e.target.textContent;
+
+  const overflow = (buffer.length >= BUFFER_LIMIT);
+  const isDecimal = (buffer.indexOf('.') !== -1);
+  const isZero = (buffer === '0');
+
+  switch (register.flag) {
+    case OPERATION:
+      // if answer exceeds the buffer limit, convert to exponential notation
+      if (overflow) buffer = Number(value).toPrecision(4).toString();
+      break;
+
+    default:
+      if (overflow) break;
+      if (buttonText === '.' && isDecimal) break;    // 1 decimal point only
+      if (buttonText !== '.' && isZero) buffer = ''; // remove leading zero
+      buffer += buttonText;
   }
 
-  // Remove leading zero, except for decimal values less than 1
-  if (displayValue === '0' && key !== '.') {
-    display.textContent = '';
-  }
-
-  display.textContent += key;
+  return buffer;
 }
 
-function clearDisplay() {
-  display.textContent = 0;
+function populateDisplay(buffer) {
+  document.querySelector('.calculator__display').textContent = buffer;
 }
 
-function clearAll() {
-  calc.numbers = [0, 0];
-  calc.operator = null;
-  clearDisplay();
+function calculate(e) {
+  register.flag = OPERATION;
+  register.answer = operate(register.operator, register.a, register.b);
+  buffer = updateBuffer(register.answer, e);
+  populateDisplay(buffer);
+
+  // prepare for next operation
+  register.a = register.b;
+  register.b = register.answer;
+  register.operator = null;
+
+  console.log(register);
 }
-
-
-/****************************************
- Constant variables
- ****************************************/
-
-const ADD = '+';
-const SUBTRACT = '−';
-const MULTIPLY = '×';
-const DIVIDE = '÷';
-
 
 /****************************************
  Calculator
  ****************************************/
 
-const display = document.querySelector('.calculator__display');
 const digits = document.querySelectorAll('.digit');
 const operators = document.querySelectorAll('.operator');
 const equals = document.querySelector('.equals');
 
-const calc = {
-  numbers: [0, 0],
+let register = {
+  a: 0,
+  b: 0,
   operator: null,
   answer: 0,
-  rewrite: false
+  flag: null      // controls whether display will be cleared
 };
+
+// Assign functions to C and CE buttons
+document.querySelector('.clear').addEventListener('click', clear);
+document.querySelector('.cancelEntry').addEventListener('click', cancelEntry);
 
 digits.forEach((button) => {
   button.addEventListener('click', (e) => {
-    if (calc.rewrite) clearDisplay();
-    calc.rewrite = false;
-    populateDisplay(e);
-    calc.numbers[1] = Number(display.textContent);
+    // clear display first if previous button pressed is an operator
+    if (register.flag !== DIGIT) {
+      cancelEntry();
+      register.flag = DIGIT;
+    }
+    buffer = updateBuffer(buffer, e);
+    register.b = Number(buffer);
+    populateDisplay(buffer);
   });
 });
 
 operators.forEach((button) => {
   button.addEventListener('click', (e) => {
-    calc.numbers[0] = calc.numbers[1];
-    calc.operator = e.target.textContent;
-    calc.rewrite = true;
+    // C and CE buttons are in a separate block
+    if (e.target.textContent[0] === 'C') return;
 
-    if (calc.operator[0] === 'C') {
-      if (calc.operator[1] === 'E') clearDisplay();
-      else clearAll();
-      return;
-    }
+    // evaluate prior inputs first if any
+    if (register.operator) calculate(e);
+
+    register.flag = OPERATION;
+    register.a = register.b;
+    register.operator = e.target.textContent;
   });
 });
 
 equals.addEventListener('click', (e) => {
-  calc.answer = operate(calc.operator, ...calc.numbers);
-  display.textContent = calc.answer;
-  calc.numbers = [0, calc.answer];
+  if (register.flag === OPERATION) return;
+  calculate(e);
 });

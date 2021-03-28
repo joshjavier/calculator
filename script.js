@@ -79,7 +79,7 @@ function updateBuffer(value, e) {
   switch (register.flag) {
     case OPERATION:
       // if answer exceeds the buffer limit, convert to exponential notation
-      if (overflow) buffer = Number(value).toPrecision(4).toString();
+      if (overflow) buffer = Number(value).toPrecision(5).toString();
       break;
 
     default:
